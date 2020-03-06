@@ -5,77 +5,183 @@
 #                                                     +:+ +:+         +:+      #
 #    By: jthierce <jthierce@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2019/02/21 10:31:20 by jthierce          #+#    #+#              #
-#    Updated: 2020/02/14 13:43:16 by jthierce         ###   ########.fr        #
+#    Created: 2018/11/07 09:05:04 by bleplat           #+#    #+#              #
+#    Updated: 2020/03/06 23:11:09 by jthierce         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = lem-in
+###########################
+###   B I N A R I E S   ###
+###########################
 
-SRC_NAME =	ft_add_room.c\
-			ft_lem_in.c\
-			ft_rooms.c\
-			ft_tools.c\
-			ft_tools2.c\
-			ft_tunnels.c\
-			ft_rooms_tunnels.c\
-			ft_resolve_karp.c\
-			ft_tdjik_tools.c\
-			ft_tdjik_tools2.c\
-			ft_add_elem.c\
-			ft_finish_djik.c\
-			ft_print.c\
-			ft_find_link.c\
-			ft_resolve_karp_2.c\
-			ft_count_end.c\
-			ft_count_end_tools.c\
-			ft_count_end_tools2.c\
-			ft_endbfs.c\
-			ft_print_tools.c\
-			ft_print_tools_2.c
+NAME        = lem-in
+
+
+###########################
+###  L I B R A R I E S  ###
+###########################
+
+LIBFT_DIR   = ./libft
+LIBFT       = $(LIBFT_DIR)/libft.a
+LIBFTMO     = libftmo.so
+
+
+###########################
+###    S O U R C E S    ###
+###########################
+
+FNT =		li_main.c \
+			li_perror.c \
+			li_board.c \
+			li_room.c \
+			li_link.c \
+			li_parse_input.c \
+			li_parse_ants.c \
+			li_parse_room.c \
+			li_parse_link.c \
+			li_parsing_finalize_rooms.c \
+			li_parsing_should_line_be_ignored.c \
+			li_parse_start_end.c \
+			li_room_find.c \
+			li_make_link.c \
+			li_board_add_output.c \
+			li_print_input.c \
+			li_print_result.c \
+			li_board_pop_output.c \
+			li_resolve.c \
+			li_matrice.c \
+			li_ini_matrice_link.c \
+			li_memrealloc.c \
+			li_bfs.c \
+			li_bfs_body.c \
+			li_create_path.c \
+			li_calc_steps.c \
+			li_insertion_sort.c \
+			li_print_matrice.c \
+			li_reset_bfs.c \
+			li_distance_path.c \
+			li_get_old_prev.c
+
+
+###########################
+###    F O L D E R S    ###
+###########################
+
+INCLUDES = includes
+SRC_DIR  = srcs
+OBJ_DIR  = .obj
+DEP_DIR  = $(OBJ_DIR)
+
+SRC = $(patsubst %, $(SRC_DIR)/%, $(FNT))
+DEP = $(patsubst %, $(DEP_DIR)/%.d, $(FNT))
+OBJ = $(patsubst %, $(OBJ_DIR)/%.o, $(FNT))
+
+
+###########################
+###   C O M P I L E R   ###
+###########################
 
 CC = gcc
 
-CFLAGS = -Werror -Wextra -Wall
+DEFINES = _DARWIN_USE_64_BIT_INODE
+CDEFINES = $(patsubst %, -D%, $(DEFINES))
 
-OBJ_NAME = $(SRC_NAME:.c=.o)
+CFLAGS = -Wall -Wextra -Werror
+CFLAGS += $(CDEFINES)
+CFLAGS += -I $(INCLUDES)
+CFLAGS += -I $(LIBFT_DIR)/includes
+#CFLAGS += -o3
 
-SRC_PATH = srcs/
+LDFLAGS += -L $(LIBFT_DIR) -lft
 
-OBJ_PATH = obj/
 
-SRC = $(addprefix $(SRC_PATH)/, $(SRC_NAME))
+###########################
+###      R U L E S      ###
+###########################
 
-OBJ = $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
-
-OBJ_FOLDER = obj
-
-HEADER = -I includes/
-
-LIBFT_PATH = libft/
-
-LIBFT = libft/libft.a
-
+.PHONY: all
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	@make -C $(LIBFT_PATH)
-	$(CC) $^ -o $@ $(CFLAGS) $(LIBFT) $(HEADER)
+.PHONY: update
+update:
+	@printf "\e[95m" || true
+	git remote update
+	git status -uno
+	@printf "\e[0m" || true
 
-$(OBJ_PATH)%.o: $(SRC_PATH)%.c
-	@mkdir $(OBJ_FOLDER) 2> /dev/null || true
-	@$(CC) $(CFLAGS) $(HEADER) -o $@ -c $<
+.PHONY: upgrade
+upgrade:
+	@printf "\e[95m" || true
+	git pull
+	@printf "\e[0m" || true
 
-.PHONY: fclean all clean re
+.PHONY: debug
+debug: LDFLAGS += -L. -lftmo -rdynamic
+debug: $(LIBFTMO) all
 
+.PHONY: optimized
+optimized: CFLAGS += -o3
+optimized: all
+
+$(NAME): $(LIBFT) $(OBJ)
+	@printf "\e[92m" || true
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDFLAGS)
+	@printf "\e[0m" || true
+
+$(OBJ_DIR):
+	@printf "\e[94m" || true
+	mkdir -p $@
+	@printf "\e[0m" || true
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/% | $(OBJ_DIR)
+	@printf "\e[96m" || true
+	$(CC) $(CFLAGS) -o $@ -I $(INCLUDES) -c $<
+	@printf "\e[0m" || true
+
+$(LIBFT):
+	@printf "\e[35m" || true
+	make -C $(LIBFT_DIR) libft.a
+	@printf "\e[0m" || true
+
+$(LIBFTMO):
+	@printf "\e[35m" || true
+	make -C $(LIBFT_DIR) libftmo.so
+	@printf "\e[35m" || true
+	cp $(LIBFT_DIR)/libftmo.so $@
+	@printf "\e[0m" || true
+
+.PHONY: clean
 clean:
-	make clean -C $(LIBFT_PATH)
-	rm -rf $(OBJ_PATH) 2> /dev/null || true
+	@printf "\e[93m" || true
+	rm -f $(OBJ)
+	rm -f $(OBJ_DIR)/*.o
+	rmdir $(OBJ_DIR) || true
+	make -C $(LIBFT_DIR) $@
+	@printf "\e[0m" || true
 
+.PHONY: fclean
 fclean: clean
-	make fclean -C $(LIBFT_PATH)
-	rm -rf $(NAME)
+	@printf "\e[91m" || true
+	rm -f $(NAME)
+	rm -f $(LIBFTMO)
+	make -C $(LIBFT_DIR) $@
+	@printf "\e[0m" || true
 
-re:
-	make fclean
-	make all
+.PHONY: re
+re: fclean all
+	@printf "\e[0m" || true
+
+
+###########################
+###  D O C   R U L E S  ###
+###########################
+
+.PHONY: geterror
+geterror:
+	grep _ERROR_ includes/li.h
+
+.PHONY: help
+help:
+	@printf "\e[0mUSAGE:\n\e[0m" || true
+	@printf "\e[0m\t./lem_in < MAP_FILE\n\e[0m" || true
+	@printf "\e[0m\t./generator [OPTIONS] | ./lem_in\n\e[0m" || true
