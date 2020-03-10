@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   li_bfs.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jthierce <jthierce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/27 19:03:31 by jthierce          #+#    #+#             */
-/*   Updated: 2020/03/06 22:45:00 by jthierce         ###   ########.fr       */
+/*   Updated: 2020/03/10 05:23:37 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,38 @@ static void li_print_status_room(t_board board)
 	i = -1;
 	while (++i < board.rooms_count)
 		ft_printf("{pink}Rooms %d status = %d\n{}", i, board.rooms[i].status);
+}
+
+static void	li_first_reset(t_board board, int **matrice)
+{
+	int i;
+
+	i = -1;
+	while (++i < board.rooms_count)
+	{
+		if (board.rooms[i].status == 7)
+			board.rooms[i].status = 2;
+		else if (board.rooms[i].status == 8)
+			board.rooms[i].status = 2;
+	}
+}
+
+static void	li_used_path(t_board board, int **matrice)
+{
+	t_room *rooms;
+
+	rooms = &board.rooms[1];
+	while (rooms != NULL)
+	{
+		if (rooms->status == 7)
+		{
+			rooms->prev = rooms->cp
+			rooms->status = 5;
+		}
+		if (rooms->status == 8)
+			rooms->status = 6;
+		rooms = rooms->cp;
+	}
 }
 
 static int li_search_other_path(t_board board, int **matrice, int *queu, int *j)
@@ -36,6 +68,8 @@ static int li_search_other_path(t_board board, int **matrice, int *queu, int *j)
 		return (-2);
 	else if (queu[i] == 0) //doute de la condition
 		return (1);
+	li_used_path(board, matrice);
+	li_first_reset(board, matrice);
 	ft_printf("{blue}On entre dans li_create_path\n{}");
 	if ((i = li_create_path(board, matrice)) == -1)
 	{

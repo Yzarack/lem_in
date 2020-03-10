@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   li_bfs_body.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jthierce <jthierce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/28 13:34:38 by jthierce          #+#    #+#             */
-/*   Updated: 2020/03/06 23:21:25 by jthierce         ###   ########.fr       */
+/*   Updated: 2020/03/10 05:16:16 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ static	int	li_bfs_type_a(t_board board, int **matrice, int *queu, int j)
 			board.rooms[board.rooms[queu[0]].link[i]].status = 1;
 			board.rooms[board.rooms[queu[0]].link[i]].prev =
 			&board.rooms[queu[0]];
+			board.rooms[board.rooms[queu[0]].link[i]].cp =
+			&board.rooms[queu[0]];
 		}
 	}
 	return (j);
@@ -64,8 +66,8 @@ static	int li_bfs_type_b(t_board board, int **matrice, int *queu, int j)
 			matrice[board.rooms[queu[0]].link[i]][queu[0]] = 3;
 			li_priority_queu(queu + i, board.rooms[queu[0]].link[i]); //queu + i??
 			j++;
-			board.rooms[board.rooms[queu[0]].link[i]].status = 5;
-			board.rooms[board.rooms[queu[0]].link[i]].prev =
+			board.rooms[board.rooms[queu[0]].link[i]].status = 7;
+			board.rooms[board.rooms[queu[0]].link[i]].cp =
 			&board.rooms[queu[0]];
 		}
 	}
@@ -87,7 +89,9 @@ static	int li_bfs_type_c(t_board board, int **matrice, int *queu, int j)
 			matrice[board.rooms[queu[0]].link[i]][queu[0]] = 7;
 			li_priority_queu(queu + i, board.rooms[queu[0]].link[i]); //queu + i??
 			j++;
-			board.rooms[board.rooms[queu[0]].link[i]].status = 6;
+			board.rooms[board.rooms[queu[0]].link[i]].status = 8;
+			board.rooms[board.rooms[queu[0]].link[i]].cp =
+			&board.rooms[queu[0]];
 		}
 	}
 	return (j);
